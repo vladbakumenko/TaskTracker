@@ -1,3 +1,5 @@
+package tasks;
+
 public class Task {
     protected String title;
     protected String description;
@@ -8,9 +10,6 @@ public class Task {
         this.title = title;
         this.description = description;
         this.id = id;
-    }
-
-    public Task() {
     }
 
     public String getTitle() {
@@ -47,7 +46,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
+        return "tasks.Task{" +
                 "title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", id=" + id +
