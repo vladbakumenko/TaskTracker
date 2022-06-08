@@ -1,45 +1,43 @@
-import manager.Managers;
-import manager.TaskManager;
+import manager.FileBackedTasksManager;
+import manager.HistoryManager;
+import tasks.Epic;
+import tasks.Subtask;
+import tasks.Task;
+
+import java.io.File;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class Main {
     public static void main(String[] args) {
-        TaskManager manager = Managers.getDefault();
 
-        manager.createTask("Задача 1", "Описание задачи 1");
-        manager.createTask("Задача 2", "Описание задачи 2");
-        manager.createTask("Задача 3", "Описание задачи 3");
-        manager.createTask("Задача 4", "Описание задачи 4");
-        manager.createTask("Задача 5", "Описание задачи 5");
+        FileBackedTasksManager fileBackedTasksManager =
+                new FileBackedTasksManager(new File(".\\TaskTrackerData"));
 
-        manager.createEpic("Эпик 1", "Описание эпика 1");
-        manager.createEpic("Эпик 2", "Описание эпика 2");
+        fileBackedTasksManager.deleteAllTasks();
 
-        manager.createSubtaskOfEpic("Эпик 1", "Подзадача 1", "Описание подзадачи 1");
-        manager.createSubtaskOfEpic("Эпик 1", "Подзадача 2", "Описание подзадачи 2");
-        manager.createSubtaskOfEpic("Эпик 1", "Подзадача 3", "Описание подзадачи 3");
+        Task task1 = fileBackedTasksManager.createTask("Task1", "Task1 description",
+                LocalDateTime.now(), Duration.ofMinutes(120));
+        Task task2 = fileBackedTasksManager.createTask("Task2", "Task2 description",
+                LocalDateTime.now().plusDays(1), Duration.ofMinutes(90));
+        Epic epic = fileBackedTasksManager.createEpic("Epic", "Epic description");
 
-        manager.createSubtaskOfEpic("Эпик 2", "Подзадача 1", "Описание подзадачи 1");
-        manager.createSubtaskOfEpic("Эпик 2", "Подзадача 2", "Описание подзадачи 2");
+        Subtask subtask1 = fileBackedTasksManager.createSubtask(epic.getId(), "Subtask1",
+                "Subtask1 description", LocalDateTime.now().plusDays(2), Duration.ofMinutes(90));
+        Subtask subtask2 = fileBackedTasksManager.createSubtask(epic.getId(), "Subtask2",
+                "Subtask2 description", LocalDateTime.now().plusDays(3), Duration.ofMinutes(90));
 
-        manager.createEpic("Эпик 3", "Описание эпика 3");
+        fileBackedTasksManager.getTaskForId(1);
 
-        manager.createSubtaskOfEpic("Эпик 3", "Подзадача 1", "Описание подзадачи 1");
+        Epic testEpic = new Epic("TestEpic", "TestEpicDescription", epic.getId());
+        fileBackedTasksManager.putEpic(testEpic);
+        fileBackedTasksManager.getTaskForId(testEpic.getId());
 
-        System.out.println(manager.getAllTasks());
+        fileBackedTasksManager.deleteAllTasks();
 
-        manager.getTaskForId(1);
-        manager.getTaskForId(2);
-        manager.getTaskForId(3);
-        manager.getTaskForId(4);
-        manager.getTaskForId(5);
-        manager.getTaskForId(6);
-        manager.getTaskForId(7);
-        manager.getTaskForId(8);
-        manager.getTaskForId(9);
-        manager.getTaskForId(10);
-        manager.getTaskForId(11);
-        manager.getTaskForId(12);
+        fileBackedTasksManager.putEpic(epic);
 
-        System.out.println(manager.getHistoryManager().getHistory());
+        fileBackedTasksManager.getTaskForId(epic.getId());
+
     }
 }

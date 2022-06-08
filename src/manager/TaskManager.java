@@ -4,36 +4,43 @@ import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
 
 public interface TaskManager {
 
-    public HistoryManager getHistoryManager();
+    HistoryManager getHistoryManager();
 
-    int getIdOfNewTask();
+    Subtask createSubtask(int epicId, String title, String description, LocalDateTime startTime, Duration duration);
 
-    void createSubtaskOfEpic(String epicTitle, String title, String description);
+    Task createTask(String title, String description, LocalDateTime startTime, Duration duration);
 
-    void createTask(String title, String description);
+    Epic createEpic(String title, String description);
 
-    void createEpic(String title, String description);
+    List<Task> getTasks();
 
-    ArrayList getAllTasks();
+    List<Epic> getEpics();
+
+    List<Subtask> getSubtasks();
+
+    List<Task> getAllTasks();
 
     void deleteAllTasks();
 
     Task getTaskForId(int id);
 
-    void updateTask(Task task);
+    void putTask(Task task);
 
-    void updateEpic(Epic epic);
+    void putEpic(Epic epic);
 
-    void updateSubtask(Subtask subtask);
+    void putSubtask(Subtask subtask);
+
+    void setNewTaskStatus(Task task, TaskStatus newStatus);
+
+    void setNewSubtaskStatus(Subtask subtask, TaskStatus newStatus);
 
     void updateEpicStatus(Epic epic);
 
     void removeTaskForId(int id);
-
-    HashMap getSubtaskOfEpic(Epic epic);
 }
