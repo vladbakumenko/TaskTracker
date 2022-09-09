@@ -1,3 +1,6 @@
 id,type,name,status,description,start-time,duration,epic
-1,TASK,Task1,NEW,Task1 description,08.06.2022|12:36,120
-2,TASK,Task2,NEW,Task2 description,08.06.2022|12:36,120
+1,TASK,Task1,IN_PROGRESS,Task1 description,09.09.2022|21:31,120
+2,TASK,Task2,NEW,Task2 description,10.09.2022|21:31,120
+3,EPIC,Epic1,NEW,Epic1 description,null,0
+
+1,3

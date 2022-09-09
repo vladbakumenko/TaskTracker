@@ -1,11 +1,12 @@
 package manager;
 
 import java.io.File;
+import java.io.IOException;
 
 public class Managers {
 
-    public static TaskManager getDefault() {
-        return new InMemoryTaskManager();
+    public static TaskManager getDefault(String url) throws IOException {
+        return HTTPTaskManager.load(url);
     }
 
     public static HistoryManager getDefaultHistory() {
@@ -13,6 +14,7 @@ public class Managers {
     }
 
     public static TaskManager getFileBackedTasksManager(File file) {
-        return new FileBackedTasksManager(file);
+        FileBackedTasksManager fileBackedTasksManager = FileBackedTasksManager.loadFromFile(file);
+        return fileBackedTasksManager;
     }
 }

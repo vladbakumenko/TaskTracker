@@ -11,16 +11,28 @@ public class Subtask extends Task {
 
     protected int idOfEpic;
 
-    public Subtask(String title, String description, int idOfNewTask, int idOfEpic,
+    public Subtask() {
+        taskType = TaskType.SUBTASK;
+    }
+    public Subtask(String title, String description, int idOfEpic,
                    LocalDateTime startTime, Duration duration) {
-        super(title, description, idOfNewTask, startTime, duration);
+        super(title, description, startTime, duration);
         this.idOfEpic = idOfEpic;
+        taskType = TaskType.SUBTASK;
     }
 
-    public Subtask(String title, String description, int idOfNewTask, int idOfEpic, TaskStatus status,
+    public Subtask(String title, String description, int id, int idOfEpic,
                    LocalDateTime startTime, Duration duration) {
-        super(title, description, idOfNewTask, status, startTime, duration);
+        super(title, description, id, startTime, duration);
         this.idOfEpic = idOfEpic;
+        taskType = TaskType.SUBTASK;
+    }
+
+    public Subtask(String title, String description, int idOfEpic, TaskStatus status,
+                   LocalDateTime startTime, Duration duration) {
+        super(title, description, status, startTime, duration);
+        this.idOfEpic = idOfEpic;
+        taskType = TaskType.SUBTASK;
     }
 
     public int getIdOfEpic() {
@@ -33,8 +45,10 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
+
         return String.format("%d,%s,%s,%s,%s,%s,%s,%d", id, TaskType.SUBTASK, title, status, description,
-                startTime.format(formatter), duration.toMinutes(), idOfEpic);
+                (startTime != null) ? startTime.format(formatter) : "null",
+                (duration != null) ? duration.toMinutes() : "null", idOfEpic);
     }
 
     @Override

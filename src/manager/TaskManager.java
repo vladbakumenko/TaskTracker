@@ -7,16 +7,17 @@ import tasks.Task;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager {
 
     HistoryManager getHistoryManager();
 
-    Subtask createSubtask(int epicId, String title, String description, LocalDateTime startTime, Duration duration);
+    void addSubtask(Subtask subtask);
 
-    Task createTask(String title, String description, LocalDateTime startTime, Duration duration);
+    void addTask(Task task);
 
-    Epic createEpic(String title, String description);
+    void addEpic(Epic epic);
 
     List<Task> getTasks();
 
@@ -40,7 +41,9 @@ public interface TaskManager {
 
     void setNewSubtaskStatus(Subtask subtask, TaskStatus newStatus);
 
-    void updateEpicStatus(Epic epic);
+    void putEpicStatus(Epic epic);
 
     void removeTaskForId(int id);
+
+    Set<Task> getPrioritizedTasks();
 }

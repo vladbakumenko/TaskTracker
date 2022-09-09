@@ -60,7 +60,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     void shouldLoadCorrectInformationWhenSubtasksIsEmpty() {
         taskManager.removeTaskForId(subtask1.getId());
         taskManager.removeTaskForId(subtask2.getId());
-        taskManager.updateEpicStatus(epic1);
+        taskManager.putEpicStatus(epic1);
 
         loadFromFile();
 

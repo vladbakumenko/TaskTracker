@@ -2,63 +2,87 @@ package tasks;
 
 import manager.TaskType;
 
-import java.time.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 public class Epic extends Task {
     private LocalDateTime endTime;
+    public void setSubtasksInEpic(Map<Integer, Subtask> subtasksInEpic) {
+        this.subtasksInEpic = subtasksInEpic;
+    }
+
     private Map<Integer, Subtask> subtasksInEpic = new HashMap<>();
+
+    public Epic() {
+        taskType = TaskType.EPIC;
+    }
+    public Epic(String title, String description) {
+        super(title, description);
+        taskType = TaskType.EPIC;
+    }
 
     public Epic(String title, String description, int id) {
         super(title, description, id);
+        taskType = TaskType.EPIC;
     }
 
     @Override
-    public Optional<LocalDateTime> getStartTime() {
-        LocalDateTime startTime = LocalDateTime.MAX;
+    public LocalDateTime getStartTime() {
+        LocalDateTime startTime = null;
 
-        if (!subtasksInEpic.isEmpty()) {
+        if (subtasksInEpic != null && !subtasksInEpic.isEmpty()) {
             for (Subtask subtask : subtasksInEpic.values()) {
-                if (subtask.getStartTime().get().isBefore(startTime)) {
-                    startTime = subtask.getStartTime().get();
+                if (startTime == null) {
+                    startTime = subtask.getStartTime();
+                    continue;
+                }
+                if (subtask.getStartTime() != null && subtask.getStartTime().isBefore(startTime)) {
+                    startTime = subtask.getStartTime();
                 }
             }
-            super.startTime = startTime;
-            return Optional.of(startTime);
-        } else {
-            return Optional.empty();
         }
+        super.startTime = startTime;
+        return super.startTime;
     }
 
     @Override
-    public Optional<Duration> getDuration() {
+    public Duration getDuration() {
         Duration duration = Duration.ofMinutes(0);
 
-        if (!subtasksInEpic.isEmpty()) {
+        if (subtasksInEpic != null && !subtasksInEpic.isEmpty()) {
             for (Subtask subtask : subtasksInEpic.values()) {
-                duration = duration.plusMinutes(subtask.getDuration().get().toMinutes());
+                if (subtask.getDuration() == null) {
+                    continue;
+                }
+                duration = duration.plusMinutes(subtask.getDuration().toMinutes());
             }
-            super.duration = duration;
         }
-        return Optional.of(super.duration);
+        super.duration = duration;
+        return super.duration;
     }
 
     @Override
-    public Optional<LocalDateTime> getEndTime() {
-        LocalDateTime localDateTime = LocalDateTime.now();
+    public LocalDateTime getEndTime() {
+        LocalDateTime subtasksEndTime = null;
 
-        if (!subtasksInEpic.isEmpty()) {
+        if (subtasksInEpic != null && !subtasksInEpic.isEmpty()) {
             for (Subtask subtask : subtasksInEpic.values()) {
-                if (subtask.getEndTime().get().isAfter(localDateTime)) {
-                    localDateTime = subtask.getEndTime().get();
+                if (subtask.getEndTime() != null) {
+                    if (subtasksEndTime == null) {
+                        subtasksEndTime = subtask.getEndTime();
+                        continue;
+                    }
+                    if (subtask.getEndTime().isAfter(subtasksEndTime)) {
+                        subtasksEndTime = subtask.getEndTime();
+                    }
                 }
             }
-            endTime = localDateTime;
         }
-        return Optional.of(endTime);
+        endTime = subtasksEndTime;
+        return endTime;
     }
 
     public Map<Integer, Subtask> getSubtasksInEpic() {
@@ -67,8 +91,10 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
+
         return String.format("%d,%s,%s,%s,%s,%s,%s", id, TaskType.EPIC, title, status, description,
-                getStartTime().get().format(formatter), getDuration().get().toMinutes());
+                (startTime != null) ? startTime.format(formatter) : "null",
+                (duration != null) ? duration.toMinutes() : "null");
     }
 
     @Override

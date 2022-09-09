@@ -21,25 +21,27 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         this.file = file;
     }
 
-    @Override
-    public Task createTask(String title, String description, LocalDateTime startTime, Duration duration) {
-        Task task = super.createTask(title, description, startTime, duration);
-        save();
-        return task;
+    public FileBackedTasksManager() {
+        super();
+        this.file = null;
     }
 
     @Override
-    public Epic createEpic(String title, String description) {
-        Epic epic = super.createEpic(title, description);
+    public void addTask(Task task) {
+        super.addTask(task);
         save();
-        return epic;
     }
 
     @Override
-    public Subtask createSubtask(int epicId, String title, String description, LocalDateTime startTime, Duration duration) {
-        Subtask subtask = super.createSubtask(epicId, title, description, startTime, duration);
+    public void addEpic(Epic epic) {
+        super.addEpic(epic);
         save();
-        return subtask;
+    }
+
+    @Override
+    public void addSubtask(Subtask subtask) {
+        super.addSubtask(subtask);
+        save();
     }
 
     @Override
@@ -61,16 +63,44 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         save();
     }
 
+    public void loadTask(Task task) {
+        TaskStatus status = TaskStatus.NEW;
+
+        if (task.getStatus().equals(TaskStatus.IN_PROGRESS) || task.getStatus().equals(TaskStatus.DONE)) {
+            status = task.getStatus();
+        }
+        super.addTask(task);
+        task.setStatus(status);
+    }
+
     @Override
     public void putEpic(Epic epic) {
         super.putEpic(epic);
         save();
     }
 
+    public void loadEpic(Epic epic) {
+        TaskStatus status = TaskStatus.NEW;
+        if (epic.getStatus().equals(TaskStatus.IN_PROGRESS) || epic.getStatus().equals(TaskStatus.DONE)) {
+            status = epic.getStatus();
+        }
+        super.addEpic(epic);
+        epic.setStatus(status);
+    }
+
     @Override
     public void putSubtask(Subtask subtask) {
         super.putSubtask(subtask);
         save();
+    }
+
+    public void loadSubtask(Subtask subtask) {
+        TaskStatus status = TaskStatus.NEW;
+        if (subtask.getStatus().equals(TaskStatus.IN_PROGRESS) || subtask.getStatus().equals(TaskStatus.DONE)) {
+            status = subtask.getStatus();
+        }
+        super.addSubtask(subtask);
+        subtask.setStatus(status);
     }
 
     @Override
@@ -86,8 +116,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void updateEpicStatus(Epic epic) {
-        super.updateEpicStatus(epic);
+    public void putEpicStatus(Epic epic) {
+        super.putEpicStatus(epic);
         save();
     }
 
@@ -158,8 +188,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         if (!value.isEmpty()) {
             String[] integers = value.split(",");
 
-            for (int i = 0; i < integers.length; i++) {
-                tasksId.add(Integer.parseInt(integers[i]));
+            for (String integer : integers) {
+                tasksId.add(Integer.parseInt(integer));
             }
         } else {
             System.out.println("История просмотров пуста.");
@@ -173,41 +203,42 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
         Task task = null;
 
-        TaskStatus status;
-        switch (arr[3]) {
-            case "NEW":
-                status = TaskStatus.NEW;
-                break;
-            case "IN_PROGRESS":
-                status = TaskStatus.IN_PROGRESS;
-                break;
-            case "DONE":
-                status = TaskStatus.DONE;
-                break;
-            default:
-                status = null;
-        }
+        TaskStatus status = switch (arr[3]) {
+            case "NEW" -> TaskStatus.NEW;
+            case "IN_PROGRESS" -> TaskStatus.IN_PROGRESS;
+            case "DONE" -> TaskStatus.DONE;
+            default -> null;
+        };
 
         int id = Integer.parseInt(arr[0]);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy|HH:mm");
-        LocalDateTime startTime = LocalDateTime.parse(arr[5], formatter);
+        LocalDateTime startTime = null;
+        if (!"null".equals(arr[5])) {
+            startTime = LocalDateTime.parse(arr[5], formatter);
+        }
 
-        Duration duration = Duration.ofMinutes(Integer.parseInt(arr[6]));
+        Duration duration = null;
+        if (!"null".equals(arr[6])) {
+            duration = Duration.ofMinutes(Integer.parseInt(arr[6]));
+        }
 
         switch (arr[1]) {
-            case "TASK":
-                task = new Task(arr[2], arr[4], id, status, startTime, duration);
-                break;
-            case "EPIC":
-                task = new Epic(arr[2], arr[4], id);
+            case "TASK" -> {
+                task = new Task(arr[2], arr[4], status, startTime, duration);
+                task.setId(id);
+            }
+            case "EPIC" -> {
+                task = new Epic(arr[2], arr[4]);
+                task.setId(id);
                 task.setStatus(status);
                 task.setStartTime(startTime);
                 task.setDuration(duration);
-                break;
-            case "SUBTASK":
-                task = new Subtask(arr[2], arr[4], id, Integer.parseInt(arr[7]), status, startTime, duration);
-                break;
+            }
+            case "SUBTASK" -> {
+                task = new Subtask(arr[2], arr[4], Integer.parseInt(arr[7]), status, startTime, duration);
+                task.setId(id);
+            }
         }
 
         return task;
@@ -273,10 +304,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             }
 
             fileBackedTasksManager.idOfNewTask = max;
-
-//            for (Epic epic : fileBackedTasksManager.getEpics()) {
-//                fileBackedTasksManager.updateEpicStatus(epic);
-//            }
 
         } catch (IOException e) {
             e.printStackTrace();

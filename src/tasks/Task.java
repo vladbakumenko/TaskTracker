@@ -7,19 +7,32 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
-import java.util.Optional;
 
 public class Task {
     protected String title;
     protected String description;
     protected int id;
 
+    protected TaskType taskType;
+
     protected TaskStatus status = TaskStatus.NEW;
 
     protected Duration duration;
     protected LocalDateTime startTime;
-    protected DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy|HH:mm");
 
+    protected static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy|HH:mm");
+
+    public Task() {
+        this.taskType = TaskType.TASK;
+    }
+
+    public Task(String title, String description, LocalDateTime startTime, Duration duration) {
+        this.title = title;
+        this.description = description;
+        this.startTime = startTime;
+        this.duration = duration;
+        this.taskType = TaskType.TASK;
+    }
 
     public Task(String title, String description, int id, LocalDateTime startTime, Duration duration) {
         this.title = title;
@@ -27,34 +40,48 @@ public class Task {
         this.id = id;
         this.startTime = startTime;
         this.duration = duration;
+        this.taskType = TaskType.TASK;
     }
 
-    public Task(String title, String description, int id, TaskStatus status,
+    public Task(String title, String description, TaskStatus status,
                 LocalDateTime startTime, Duration duration) {
         this.title = title;
         this.description = description;
-        this.id = id;
         this.status = status;
         this.startTime = startTime;
         this.duration = duration;
+        this.taskType = TaskType.TASK;
+    }
+
+    public Task(String title, String description) {
+        this.title = title;
+        this.description = description;
+        this.taskType = TaskType.TASK;
     }
 
     public Task(String title, String description, int id) {
         this.title = title;
         this.description = description;
         this.id = id;
+        this.taskType = TaskType.TASK;
     }
 
-    public Optional<LocalDateTime> getEndTime() {
-        return Optional.of(startTime.plus(duration));
+    public LocalDateTime getEndTime() {
+        LocalDateTime endTime = null;
+        if (startTime != null && duration != null) {
+            endTime = startTime.plus(duration);
+        } else if (startTime != null) {
+            endTime = startTime;
+        }
+        return endTime;
     }
 
-    public Optional<Duration> getDuration() {
-        return Optional.of(duration);
+    public Duration getDuration() {
+        return duration;
     }
 
-    public Optional<LocalDateTime> getStartTime() {
-            return Optional.of(startTime);
+    public LocalDateTime getStartTime() {
+        return startTime;
     }
 
     public void setDuration(Duration duration) {
@@ -99,8 +126,9 @@ public class Task {
 
     @Override
     public String toString() {
-        return String.format("%d,%s,%s,%s,%s,%s,%s", id, TaskType.TASK, title, status, description,
-                startTime.format(formatter), duration.toMinutes());
+        return String.format("%d,%s,%s,%s,%s,%s,%s", id, taskType, title, status, description,
+                (startTime != null) ? startTime.format(formatter) : "null",
+                (duration != null) ? duration.toMinutes() : "null");
     }
 
 
@@ -109,7 +137,8 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return id == task.id && Objects.equals(title, task.title) && Objects.equals(description, task.description) && status == task.status;
+        return id == task.id && Objects.equals(title, task.title) && Objects.equals(description, task.description) &&
+                status == task.status;
     }
 
     @Override

@@ -28,11 +28,26 @@ class InMemoryHistoryManagerTest {
     public void beforeEach() {
         taskManager = new InMemoryTaskManager();
         historyManager = taskManager.getHistoryManager();
-        task1 = taskManager.createTask("Task1", "Task1 description", LocalDateTime.now(), Duration.ofMinutes(120));
-        task2 = taskManager.createTask("Task2", "Task2 description", LocalDateTime.now(), Duration.ofMinutes(120));
-        epic1 = taskManager.createEpic("Epic1", "Epic1 description");
-        subtask1 = taskManager.createSubtask(epic1.getId(), "Subtask1", "Subtask1 description", LocalDateTime.now(), Duration.ofMinutes(120));
-        subtask2 = taskManager.createSubtask(epic1.getId(), "Subtask2", "Subtask2 description", LocalDateTime.now(), Duration.ofMinutes(120));
+
+        task1 = new Task("Task1", "Task1 description", LocalDateTime.now().plusDays(1),
+                Duration.ofMinutes(120));
+        taskManager.addTask(task1);
+
+        task2 = new Task("Task2", "Task2 description", LocalDateTime.now().plusDays(2),
+                Duration.ofMinutes(120));
+        taskManager.addTask(task2);
+
+        epic1 = new Epic("Epic1", "Epic1 description");
+        taskManager.addEpic(epic1);
+
+        subtask1 = new Subtask("Subtask1", "Subtask1 description", epic1.getId(),
+                LocalDateTime.now().plusDays(3), Duration.ofMinutes(120));
+        taskManager.addSubtask(subtask1);
+
+        subtask2 = new Subtask("Subtask2", "Subtask2 description", epic1.getId(),
+                LocalDateTime.now().plusDays(4), Duration.ofMinutes(120));
+        taskManager.addSubtask(subtask2);
+
         addTasksToHistory();
     }
 
