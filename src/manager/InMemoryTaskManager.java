@@ -79,7 +79,9 @@ public class InMemoryTaskManager implements TaskManager {
         task.setStatus(TaskStatus.NEW);
 
         if (isValidForDuration(task)) {
-            task.setId(getIdOfNewTask());
+            if (task.getId() == 0) {
+                task.setId(getIdOfNewTask());
+            }
             tasks.put(task.getId(), task);
             prioritizedList.add(task);
         } else {
@@ -94,7 +96,9 @@ public class InMemoryTaskManager implements TaskManager {
         epic.setSubtasksInEpic(new HashMap<>());
 
         if (isValidForDuration(epic)) {
-            epic.setId(getIdOfNewTask());
+            if (epic.getId() == 0) {
+                epic.setId(getIdOfNewTask());
+            }
             epics.put(epic.getId(), epic);
             prioritizedList.add(epic);
         } else {
@@ -109,7 +113,9 @@ public class InMemoryTaskManager implements TaskManager {
         if (epics.get(epicId) != null) {
             subtask.setStatus(TaskStatus.NEW);
             if (isValidForDuration(subtask)) {
-                subtask.setId(getIdOfNewTask());
+                if (subtask.getId() == 0) {
+                    subtask.setId(getIdOfNewTask());
+                }
                 prioritizedList.remove(epics.get(epicId));
                 epics.get(epicId).getSubtasksInEpic().put(subtask.getId(), subtask);
                 subtasks.put(subtask.getId(), subtask);
@@ -229,11 +235,6 @@ public class InMemoryTaskManager implements TaskManager {
         epic.getStartTime();
         epic.getDuration();
         this.putEpicStatus(epic);
-
-//        if (!isValidForDuration(epic)) {
-//            prioritizedList.add(oldEpic);
-//            return;
-//        }
 
         epics.put(epic.getId(), epic);
         prioritizedList.add(epic);
